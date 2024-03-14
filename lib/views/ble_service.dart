@@ -136,12 +136,12 @@ class _BleDevicesState extends State<BleDevices> {
                                   AsyncSnapshot<List<ScanResult>> snapshot) {
                                 if (snapshot.hasData) {
                                   return CircleAvatar(
-                                    radius: 15,
+                                    radius: 12,
                                     backgroundColor: Colors.blue,
                                     child: Text(
                                       snapshot.data![index].rssi.toString(),
                                       style: const TextStyle(
-                                          color: Colors.white, fontSize: 12),
+                                          color: Colors.white, fontSize: 10),
                                     ),
                                   );
                                 } else {
