@@ -127,21 +127,47 @@ class _BleDevicesState extends State<BleDevices> {
                             color: Colors.grey[700],
                           ),
                         ),
-                        trailing: GestureDetector(
-                          onTap: () {
-                            Navigator.of(appNavigatorKey.currentContext!).push(
-                              MaterialPageRoute(
-                                builder: (context) => DevicePage(
-                                  device: devices[index].device,
-                                ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            StreamBuilder<List<ScanResult>>(
+                              stream: FlutterBluePlus.scanResults,
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<List<ScanResult>> snapshot) {
+                                if (snapshot.hasData) {
+                                  return CircleAvatar(
+                                    radius: 15,
+                                    backgroundColor: Colors.blue,
+                                    child: Text(
+                                      snapshot.data![index].rssi.toString(),
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 12),
+                                    ),
+                                  );
+                                } else {
+                                  return const CircularProgressIndicator();
+                                }
+                              },
+                            ),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(appNavigatorKey.currentContext!)
+                                    .push(
+                                  MaterialPageRoute(
+                                    builder: (context) => DevicePage(
+                                      device: devices[index].device,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: const Icon(
+                                Icons.arrow_forward_ios,
+                                color: Colors.blue,
+                                size: 18,
                               ),
-                            );
-                          },
-                          child: const Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.blue,
-                            size: 18,
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
