@@ -23,12 +23,6 @@ class _DevicePageState extends State<DevicePage> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    disconnectFromDevice(widget.device);
-    super.dispose();
-  }
-
   Future<void> connectToDevice(BluetoothDevice device) async {
     try {
       // Connect to the device
