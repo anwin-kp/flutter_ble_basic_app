@@ -61,7 +61,9 @@ class _BleDevicesState extends State<BleDevices> {
                 '${r.device.remoteId}: "${r.advertisementData.advName}" found!');
           }
           setState(() {
-            if (r.device.advName.isNotEmpty) {
+            if (r.device.advName.isNotEmpty &&
+                !devices.any(
+                    (device) => device.device.remoteId == r.device.remoteId)) {
               devices.add(r);
             }
           });
