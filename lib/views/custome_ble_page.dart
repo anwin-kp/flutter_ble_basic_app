@@ -15,6 +15,8 @@ class _DevicePageState extends State<DevicePage> {
   bool isConnected = false;
   String deviceName = '';
   String deviceId = '';
+  late BluetoothCharacteristic writeBle;
+  late BluetoothCharacteristic readBle;
 
   @override
   void initState() {
@@ -23,31 +25,47 @@ class _DevicePageState extends State<DevicePage> {
     super.initState();
   }
 
+  Future<void> findCharacteristics(
+      BluetoothDevice device, BuildContext context) async {
+    List<BluetoothService> services = await device.discoverServices();
+    for (var service in services) {
+      if (service.uuid.toString() == "Constants.OPERATIONAL_UUID") {
+        for (var characteristic in service.characteristics) {
+          if (characteristic.uuid.toString() == "Constants.WRITE_UUID") {
+            writeBle = characteristic;
+          }
+          if (characteristic.uuid.toString() == "Constants.READ_UUID") {
+            readBle = characteristic;
+          }
+        }
+      }
+    }
+  }
+
   Future<void> connectToDevice(BluetoothDevice device) async {
     try {
       // Connect to the device
       await device.connect();
 
       // Verify the connection is successful
-      if (device.isConnected) {
-        if (kDebugMode) {
-          print('Connected to ${device.advName}');
+      device.connectionState.listen((event) {
+        if (device.isConnected) {
+          if (kDebugMode) {
+            print('Connected to ${device.advName}');
+          }
+          setState(() {
+            isConnected = true;
+          });
+          findCharacteristics(device, context);
+        } else if (event == BluetoothConnectionState.disconnected) {
+          if (kDebugMode) {
+            setState(() {
+              isConnected = false;
+            });
+            print("Disconnected");
+          }
         }
-        setState(() {
-          isConnected = true;
-        });
-      } else if (device.isDisconnected) {
-        if (kDebugMode) {
-          print('Disconnected to ${device.advName}');
-        }
-        setState(() {
-          isConnected = false;
-        });
-      } else {
-        if (kDebugMode) {
-          print('Failed to connect to ${device.advName}');
-        }
-      }
+      });
     } catch (e) {
       // Handle connection errors
       if (kDebugMode) {
