@@ -1,6 +1,6 @@
-class Utility {
-  Utility._();
-  static final Utility instance = Utility._();
+class ModbusProtocol {
+  ModbusProtocol._();
+  static final ModbusProtocol instance = ModbusProtocol._();
   int calculateCrc16(List<int> data) {
     const int polynomial = 0xA001;
     int crc = 0xFFFF;
