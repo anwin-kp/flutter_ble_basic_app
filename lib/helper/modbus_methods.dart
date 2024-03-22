@@ -331,6 +331,7 @@ class ModbusProtocol {
 
     return message;
   }
+
   //Write Multiple Holding Registers on Modbus
   /*
   Example:
@@ -384,6 +385,50 @@ class ModbusProtocol {
       message.add(int.parse(
           value.toRadixString(16).padLeft(4, '0').substring(2, 4),
           radix: 16));
+    }
+
+    // Calculate CRC
+    var crc = calculateCrc16(message);
+    final checksum = crc.toRadixString(16).padLeft(4, '0');
+
+    // Add CRC to the message
+    message.add(int.parse(checksum.substring(2, 4), radix: 16));
+    message.add(int.parse(checksum.substring(0, 2), radix: 16));
+
+    return message;
+  }
+
+  //Write File Record on Modbus
+  List<int> createWriteFileRecordMessage(
+      int slaveId, int fileNumber, int recordNumber, List<int> recordData) {
+    List<int> message = [];
+    message.add(slaveId); // Slave ID
+    message.add(14); // Function code for "Write File Record"
+
+    // Byte count
+    message.add(7 +
+        recordData.length *
+            2); // 7 bytes for reference type, file number, record number and record length, plus 2 bytes per record data
+
+    // Reference type
+    message.add(6); // 6 for user-defined file
+
+    // File number
+    message.add((fileNumber >> 8) & 0xFF);
+    message.add(fileNumber & 0xFF);
+
+    // Record number
+    message.add((recordNumber >> 8) & 0xFF);
+    message.add(recordNumber & 0xFF);
+
+    // Record length
+    message.add((recordData.length >> 8) & 0xFF);
+    message.add(recordData.length & 0xFF);
+
+    // Record data
+    for (int value in recordData) {
+      message.add((value >> 8) & 0xFF);
+      message.add(value & 0xFF);
     }
 
     // Calculate CRC
